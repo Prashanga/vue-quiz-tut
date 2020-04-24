@@ -11,15 +11,14 @@
           :key="index"
           @click="selectAnswer(index)"
           v-html="answer"
-          :class="{ selected: index === selectedIndex }"
-        >
-        </b-list-group-item>
+          :class="answeredClass(index)"
+        ></b-list-group-item>
       </b-list-group>
 
       <b-button
         variant="primary"
         @click="submitAnswer"
-        :disabled="!selectedIndex && answered"
+        :disabled="selectedIndex === null || answered"
         >Submit</b-button
       >
       <b-button variant="success" @click="next">Next</b-button>
@@ -57,6 +56,7 @@ export default {
       immediate: true,
       handler() {
         this.selectedIndex = null
+        this.answered = false
         this.shuffleAnswers()
       },
     },
@@ -78,7 +78,23 @@ export default {
         isCorrect = true
       }
       this.increment(isCorrect)
-      this.answered === true
+      this.answered = true
+    },
+    answeredClass(index) {
+      let answerClass = ""
+
+      if (!this.answered && this.selectedIndex === index) {
+        answerClass = "selected"
+      } else if (this.answered && this.correctIndex === index) {
+        answerClass = "correct"
+      } else if (
+        this.answered &&
+        this.correctIndex !== index &&
+        this.selectedIndex === index
+      ) {
+        answerClass = "incorrect"
+      }
+      return answerClass
     },
   },
 }
@@ -109,5 +125,6 @@ export default {
 .btn:disabled {
   background-color: lightgrey;
   border: none;
+  cursor: default;
 }
 </style>
